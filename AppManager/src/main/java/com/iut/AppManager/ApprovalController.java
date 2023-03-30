@@ -13,6 +13,9 @@ public class ApprovalController {
     public ApprovalController(ApprovalRepository repository){
         this.reposiroty = repository;
         this.reposiroty.save(new Approval(1L, "approved"));
+        this.reposiroty.save(new Approval(2L, "refused"));
+        this.reposiroty.save(new Approval(3L, "approved"));
+        this.reposiroty.save(new Approval(4L, "refused"));
     }
 
     @GetMapping("/")

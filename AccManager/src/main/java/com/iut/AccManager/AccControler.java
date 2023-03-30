@@ -2,11 +2,10 @@ package com.iut.AccManager;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 public class AccControler {
@@ -15,6 +14,9 @@ public class AccControler {
 
     public AccControler(AccountRepository repository){
         this.repository = repository;
+        repository.save(new Account(2000, "Low"));
+        repository.save(new Account(2000, "High"));
+        repository.save(new Account(2000, "High"));
         repository.save(new Account(2000, "Low"));
     }
 
@@ -38,6 +40,18 @@ public class AccControler {
     public @ResponseBody Account account(@PathVariable int id){
         for(Account acc : repository.findAll()){
             if(acc.getId() == id){
+                return acc;
+            }
+        }
+        return null;
+    }
+
+    @PutMapping(value= "/accounts/account/{id}/{somme}", produces = MediaType.APPLICATION_JSON_VALUE)
+    public @ResponseBody Account addMoney(@PathVariable long id, @PathVariable int somme){
+        for(Account acc : repository.findAll()){
+            if(acc.getId() == id){
+                acc.setSomme(acc.getSomme()+somme);
+                repository.save(acc);
                 return acc;
             }
         }
