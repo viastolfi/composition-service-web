@@ -1,9 +1,13 @@
 package com.iut.AppManager;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.hateoas.EntityModel;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 
 @RestController
 public class ApprovalController {
@@ -29,7 +33,7 @@ public class ApprovalController {
     }
 
     @DeleteMapping("/approvals/approval/{id}")
-    @ResponseBody Approval deleteApproval(@PathVariable int id){
+    @ResponseBody EntityModel<Approval> deleteApproval(@PathVariable long id){
         Approval out = null;
         for(Approval app : reposiroty.findAll()){
             if(app.getId() == id){
@@ -37,20 +41,26 @@ public class ApprovalController {
                 reposiroty.delete(app);
             }
         }
-        return out;
+        return EntityModel.of(out,
+                linkTo(methodOn(ApprovalController.class).approvals()).withRel("approvals"));
     }
 
     @PostMapping("/approvals")
-    @ResponseBody Approval addApproval(@RequestBody Approval app){
+    @ResponseBody EntityModel<Approval> addApproval(@RequestBody Approval app){
         reposiroty.save(app);
-        return app;
+        return EntityModel.of(app,
+                linkTo(methodOn(ApprovalController.class).getApproval(app.getId())).withSelfRel(),
+                linkTo(methodOn(ApprovalController.class).approvals()).withRel("approvals"));
     }
 
     @GetMapping("/approvals/approval/{id}")
-    @ResponseBody Approval getApproval(@PathVariable int id){
+    @ResponseBody EntityModel<Approval> getApproval(@PathVariable long id){
        for(Approval app : reposiroty.findAll()) {
            if(app.getId() == id){
-               return app;
+               return EntityModel.of(app,
+                       linkTo(methodOn(ApprovalController.class).getApproval(app.getId())).withSelfRel(),
+                       linkTo(methodOn(ApprovalController.class).deleteApproval(app.getId())).withRel("drop"),
+                       linkTo(methodOn(ApprovalController.class).approvals()).withRel("approvals"));
            }
        }
        return null;
