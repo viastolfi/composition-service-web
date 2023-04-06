@@ -51,12 +51,14 @@ public class AccControler {
     }
 
     @PutMapping(value= "/accounts/account/{id}/{somme}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public @ResponseBody Account addMoney(@PathVariable long id, @PathVariable int somme){
+    public @ResponseBody EntityModel<Account> addMoney(@PathVariable long id, @PathVariable int somme){
         for(Account acc : repository.findAll()){
             if(acc.getId() == id){
                 acc.setSomme(acc.getSomme()+somme);
                 repository.save(acc);
-                return acc;
+                return EntityModel.of(acc,
+                        linkTo(methodOn(AccControler.class).accounts()).withRel("See all accounts"),
+                        linkTo(methodOn(AccControler.class).account(id)).withRel("See the changed account"));
             }
         }
         return null;
