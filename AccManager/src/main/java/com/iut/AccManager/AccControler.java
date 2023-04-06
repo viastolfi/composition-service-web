@@ -1,8 +1,11 @@
 package com.iut.AccManager;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.hateoas.EntityModel;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 
 import java.util.List;
 import java.util.Optional;
@@ -37,10 +40,11 @@ public class AccControler {
     }
 
     @GetMapping(value = "/accounts/account/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public @ResponseBody Account account(@PathVariable int id){
+    public @ResponseBody EntityModel<Account> account(@PathVariable long id){
         for(Account acc : repository.findAll()){
             if(acc.getId() == id){
-                return acc;
+                return EntityModel.of(acc,
+                        linkTo(methodOn(AccControler.class).accounts()).withRel("See all accounts"));
             }
         }
         return null;
